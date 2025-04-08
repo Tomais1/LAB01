@@ -1,0 +1,75 @@
+public class VigenereCipher {
+    private int[] key;
+    private char[][] alphabet;
+
+    public VigenereCipher(String numericKey) {
+        this.key = new int[numericKey.length()];
+        alphabet = new char[64][64];
+
+        for (int i = 0; i < numericKey.length(); i++) {
+            char letra = numericKey.charAt(i);
+            this.key[i] = charToInt(letra);
+        }
+
+        for (int i = 0; i < 64; i++) {
+            for (int j = 0; j < 64; j++) {
+                alphabet[i][j] = intToChar((i + j) % 64);
+            }
+        }
+    }
+
+    private int charToInt(char letra) {
+        if (letra >= 'a' && letra <= 'z') return letra - 'a';
+        if (letra >= 'A' && letra <= 'Z') return letra - 'A' + 26;
+        if (letra >= '0' && letra <= '9') return letra - '0' + 52;
+        if (letra == 'Ñ') return 62;
+        if (letra == 'ñ') return 63;
+        return -1;
+    }
+
+    private char intToChar(int value) {
+        if (value >= 0 && value < 26) return (char) ('a' + value);
+        if (value >= 26 && value < 52) return (char) ('A' + value - 26);
+        if (value >= 52 && value < 62) return (char) ('0' + value - 52);
+        if (value == 62) return 'Ñ';
+        if (value == 63) return 'ñ';
+        return ' ';
+    }
+
+    public String encrypt(String message) {
+        String encryptedMessage = "";
+        int keyIndex = 0;
+
+        for (int i = 0; i < message.length(); i++) {
+            char messageChar = message.charAt(i);
+
+            int keyValue = key[keyIndex % key.length];
+            int messageValue = charToInt(messageChar); // convertir letra a número 0 -> 63
+
+            char encryptedChar = alphabet[messageValue][keyValue];
+
+            encryptedMessage += encryptedChar;
+            keyIndex++;
+        }
+        return encryptedMessage;
+    }
+
+    public String decrypt(String encryptedMessage) {
+        String decryptedMessage = "";
+        int keyIndex = 0;
+
+        for (int i = 0; i < encryptedMessage.length(); i++) {
+            char encryptedChar = encryptedMessage.charAt(i);
+
+            int KeyValue = key[keyIndex % key.length];
+            int encryptedValue = charToInt(encryptedChar);
+
+            int decryptedValue = (encryptedValue - KeyValue + 64) % 64;
+            char decryptedChar = intToChar(decryptedValue);
+
+            decryptedMessage += decryptedChar;
+            keyIndex++;
+        }
+        return decryptedMessage;
+    }
+}`
