@@ -1,0 +1,180 @@
+import java.util.Scanner;
+
+public class BigVigenere {
+    int[] key;
+    char[][] alphabet;
+
+    // Constructor sin parámetros (solicita al usuario la clave)
+    public BigVigenere() {
+        this.key = new int[0];
+        alphabet = new char[26][26];
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingresa una key:");
+        String userName = scanner.nextLine();
+        System.out.println("La llave es: " + userName);
+
+        userName = userName.toUpperCase();
+        this.key = new int[userName.length()];
+
+        // Convierte la clave a un arreglo numérico
+        for (int i = 0; i < userName.length(); i++) {
+            char letra = userName.charAt(i);
+            if (letra >= 'A' && letra <= 'Z') {
+                this.key[i] = letra - 'A';
+            } else {
+                System.out.println("Caracter invalido: " + letra);
+                this.key[i] = 0;
+            }
+        }
+
+        // Rellena la matriz del alfabeto
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                alphabet[i][j] = (char) ('A' + (i + j) % 26);
+            }
+        }
+
+        imprimirAlphabet(); // Lo imprimo para ver si funciona bien la matriz con las letras
+    }
+
+    // Constructor con parámetro (recibe la clave numérica como un String)
+    public BigVigenere(String numericKey) {
+        this.key = new int[numericKey.length()];
+        alphabet = new char[26][26];
+
+        numericKey = numericKey.toUpperCase();
+        this.key = new int[numericKey.length()];
+
+        // Convierte la clave a un arreglo numérico
+        for (int i = 0; i < numericKey.length(); i++) {
+            char letra = numericKey.charAt(i);
+            if (letra >= 'A' && letra <= 'Z') {
+                this.key[i] = letra - 'A';
+            } else {
+                System.out.println("Caracter invalido: " + letra);
+                this.key[i] = 0;
+            }
+        }
+
+        // Rellena la matriz
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                alphabet[i][j] = (char) ('A' + (i + j) % 26);
+            }
+        }
+
+        imprimirAlphabet();
+    }
+
+    public void imprimirAlphabet() {
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                System.out.print(alphabet[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    // Método para cifrar el mensaje
+    public String encrypt(String message) {
+        String encryptedMessage = "";
+        int keyIndex = 0;
+
+        message = message.toUpperCase(); // Aseguramos trabajar en mayúsculas
+
+        for (int i = 0; i < message.length(); i++) {
+            char messageChar = message.charAt(i);
+
+            if (messageChar >= 'A' && messageChar <= 'Z') {
+                int keyValue = key[keyIndex % key.length];
+                int messageValue = messageChar - 'A';  // Convertir letra a número 0-25
+
+                // Cifrado usando la tabla
+                char encryptedChar = alphabet[messageValue][keyValue];
+                encryptedMessage += encryptedChar;
+
+                keyIndex++; // Avanzamos en la clave
+            } else {
+                // Si no es letra, lo dejamos igual
+                encryptedMessage += messageChar;
+            }
+        }
+        return encryptedMessage;
+    }
+
+    public String decrypt(String encryptedMessage) {
+        String decryptedMessage = "";
+        int keyIndex = 0;
+
+        encryptedMessage = encryptedMessage.toUpperCase(); // Aseguramos trabajar en mayúsculas
+
+        for (int i = 0; i < encryptedMessage.length(); i++) {
+            char encryptedChar = encryptedMessage.charAt(i);
+
+            if (encryptedChar >= 'A' && encryptedChar <= 'Z') {
+                int keyValue = key[keyIndex % key.length];
+                int encryptedValue = encryptedChar - 'A';
+
+                // Descifrado: (valor cifrado - clave + 26) % 26
+                int decryptedValue = (encryptedValue - keyValue + 26) % 26;
+                decryptedMessage += (char) ('A' + decryptedValue);
+
+                keyIndex++;
+            } else {
+                decryptedMessage += encryptedChar;
+            }
+        }
+        return decryptedMessage;
+    }
+
+    // Método para cambiar la clave y reencriptar
+    public void reEncrypt() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingresa la nueva key:");
+        String nuevaKey = scanner.nextLine();
+        nuevaKey = nuevaKey.toUpperCase();
+
+        this.key = new int[nuevaKey.length()];
+
+        for (int i = 0; i < nuevaKey.length(); i++) {
+            char letra = nuevaKey.charAt(i);
+            if (letra >= 'A' && letra <= 'Z') {
+                this.key[i] = letra - 'A';
+            } else {
+                System.out.println("Caracter invalido: " + letra);
+                this.key[i] = 0;
+            }
+        }
+
+        System.out.println("Clave cambiada exitosamente.");
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        BigVigenere cipher = new BigVigenere(); // Primera clave pedida al crear el objeto
+
+        boolean continuar = true;
+
+        while (continuar) {
+            System.out.println("Ingresa el mensaje a cifrar:");
+            String mensaje = scanner.nextLine();
+
+            String mensajeCifrado = cipher.encrypt(mensaje);
+            System.out.println("Mensaje cifrado: " + mensajeCifrado);
+
+            String mensajeDescifrado = cipher.decrypt(mensajeCifrado);
+            System.out.println("Mensaje decifrado: " + mensajeDescifrado);
+
+            System.out.println("¿Desea cambiar la clave y reencriptar el mensaje? (si/no)");
+            String respuesta = scanner.nextLine();
+
+            if (respuesta.equalsIgnoreCase("si") || respuesta.equalsIgnoreCase("s")) {
+                cipher.reEncrypt(); // Pide nueva clave y vuelve a cifrar
+            } else {
+                continuar = false;
+                System.out.println("Programa terminado.");
+            }
+        }
+    }
+}
