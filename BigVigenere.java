@@ -131,11 +131,9 @@ public class BigVigenere {
         return alphabet[fila][col];
      }
 
-     public char optimalSearch(int position) {
-        int fila = position / 64;
-        int col = position % 64;
-        return alphabet[fila][col];
-     }
+       public char optimalSearch(int position) {
+        return alphabet[position / 64][position % 64];
+    }
 
      public static void main(String[] args) {
          Scanner scanner = new Scanner(System.in);
